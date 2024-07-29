@@ -1,0 +1,26 @@
+import os
+
+caminho_pasta = r'C:\Users\Marcelo Abud\Downloads\VScode - NÃO EXCLUIR!!!!!!!!!!!!!!!! N Ã O  E X C L U I R !!!!!\programas\Códigos escritório - Gio\XML_DELL'
+prefixo = 'NF '
+    
+def renomear_arquivos(caminho_pasta, prefixo):
+    try:
+        os.chdir(caminho_pasta)
+        arquivos = os.listdir(caminho_pasta)
+
+        for file in arquivos:
+            if file.lower().endswith('.pdf') and not file.startswith(prefixo):
+                old_name = os.path.join(caminho_pasta, file)
+                new_name = str(prefixo + file)
+                # Para notas da HP, utilizar o new_name abaixo = 
+                novos_digitos = ('NF ' + new_name[31:37])
+                caminho_novo = os.path.join(caminho_pasta, novos_digitos + '.pdf')
+
+                os.rename(old_name, caminho_novo)
+                print(f"Renomeado: {old_name} -> {caminho_novo}")
+
+        print("Renomeação concluída!")
+    except Exception as e:
+        print(f"Ocorreu um erro: {e}")
+
+renomear_arquivos(caminho_pasta, prefixo)
