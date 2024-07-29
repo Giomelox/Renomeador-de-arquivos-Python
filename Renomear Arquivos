@@ -1,6 +1,6 @@
 import os
 
-caminho_pasta = r'C:\Users\Marcelo Abud\Downloads\VScode - NÃO EXCLUIR!!!!!!!!!!!!!!!! N Ã O  E X C L U I R !!!!!\programas\Códigos escritório - Gio\XML_DELL'
+caminho_pasta = --Caminho com os PDFs desejados para renomear--
 prefixo = 'NF '
     
 def renomear_arquivos(caminho_pasta, prefixo):
