@@ -1,26 +1,507 @@
 import os
+from xml.dom import minidom
+import time
 
-caminho_pasta = --Caminho com os PDFs desejados para renomear--
+caminho_pasta = r'C:\Users\Marcelo Abud\Downloads\XML_DELL'
+
 prefixo = 'NF '
+
+def renomear_PDF_1(caminho_pasta, prefixo):
+8
+    print('=' * 60)
+
+    confirmar1 = str(input('Tem certeza que deseja renomear PDFs 1?(S/N): ')).strip().upper()
+
+    if confirmar1 == 'S':
+        try:
+            os.chdir(caminho_pasta)
+            arquivos = os.listdir(caminho_pasta)
+
+            for file in arquivos:
+                if file.lower().endswith('.pdf') and not file.startswith(prefixo):
+
+                    old_name = os.path.join(caminho_pasta, file)
+
+                    new_name = str(prefixo + file)
+
+                    novos_digitos = ('NF ' + new_name[35:40])
+
+                    caminho_novo = os.path.join(caminho_pasta, novos_digitos + '.pdf')
+
+                    os.rename(old_name, caminho_novo)
+                    print(f'Renomeado: {old_name} -> {caminho_novo}')
+
+            print('\nRenomeação concluída!\n')
+
+            lobby_principal()
+
+        except Exception as e:
+            print(f'Ocorreu um erro: {e}')
+
+    elif confirmar1 == 'N':
+        print('=' * 60)
+        lobby_voltar()
     
-def renomear_arquivos(caminho_pasta, prefixo):
-    try:
-        os.chdir(caminho_pasta)
-        arquivos = os.listdir(caminho_pasta)
+    else:
+        print('\nValor inválido\n')
 
-        for file in arquivos:
-            if file.lower().endswith('.pdf') and not file.startswith(prefixo):
-                old_name = os.path.join(caminho_pasta, file)
-                new_name = str(prefixo + file)
-                # Para notas da HP, utilizar o new_name abaixo = 
-                novos_digitos = ('NF ' + new_name[31:37])
-                caminho_novo = os.path.join(caminho_pasta, novos_digitos + '.pdf')
+def renomear_XML_2(caminho_pasta, prefixo):
 
-                os.rename(old_name, caminho_novo)
-                print(f"Renomeado: {old_name} -> {caminho_novo}")
+    print('=' * 60)
 
-        print("Renomeação concluída!")
-    except Exception as e:
-        print(f"Ocorreu um erro: {e}")
+    confirmar2 = str(input('Tem certeza que deseja renomear XMLs 2?(S/N): ')).strip().upper()
 
-renomear_arquivos(caminho_pasta, prefixo)
+    if confirmar2 == 'S':
+        try:
+            os.chdir(caminho_pasta)
+            arquivos = os.listdir(caminho_pasta)
+
+            for file in arquivos:
+                if file.endswith('-procNFe.xml') and file.startswith('NFe') and not file.startswith(prefixo):
+                    # Caminho completo do arquivo
+                    xml_file = os.path.join(caminho_pasta, file)
+                        
+                    try:
+                        # Parse do arquivo XML
+                        tree = minidom.parse(xml_file)
+                        nf_list = tree.getElementsByTagName('nNF')
+
+                        # Verificar se há elementos 'nNF'
+                        if nf_list and nf_list[0].firstChild:
+                            numero_nf = nf_list[0].firstChild.nodeValue
+                            
+                            # Criar novo nome para o arquivo
+                            novos_digitos = f'NF {numero_nf}.xml'
+                            caminho_novo = os.path.join(caminho_pasta, novos_digitos)
+
+                            # Renomear o arquivo
+                            os.rename(xml_file, caminho_novo)
+                            print(f'Renomeado: {file} -> {novos_digitos}')
+                        else:
+                            print(f"Arquivo {file} não contém o elemento 'nNF'.")
+                    except Exception as e:
+                        print(f'Erro ao processar {file}: {e}')
+
+            print('\nRenomeação concluída!\n')
+
+            lobby_principal()
+        except Exception as e:
+            print(f"Ocorreu um erro: {e}")
+
+    elif confirmar2 == 'N':
+        print('=' * 60)
+        lobby_voltar()
+    
+    else:
+        print('\nValor inválido\n')
+
+def renomear_XML_3_nãoConfirmado(caminho_pasta):
+
+    print('=' * 60)
+
+    confirmar3 = str(input('Tem certeza que deseja renomear XMLs não confirmados 3?(S/N): ')).strip().upper()
+
+    if confirmar3 == 'S':
+
+        try:
+            # Índice para arquivos `.crdownload`
+            idx = 1
+
+            # Mudar para o diretório especificado
+            os.chdir(caminho_pasta)
+            arquivos = os.listdir(caminho_pasta)
+
+            # Renomear arquivos `.crdownload` para formato temporário `.xml`
+            for file in arquivos:
+                if file.lower().endswith('.crdownload'):
+                    caminho_antigo = os.path.join(caminho_pasta, file)
+                    novo_nome_temporario = os.path.join(caminho_pasta, f"{idx}-NF.xml")
+                    os.rename(caminho_antigo, novo_nome_temporario)
+                    print(f"Renomeado temporariamente: {file} -> {idx}-NF.xml")
+                    idx += 1
+
+            # Atualizar lista de arquivos após a renomeação
+            arquivos = os.listdir(caminho_pasta)
+
+            # Renomear arquivos `.xml` com base no conteúdo do elemento `nNF`
+            for file in arquivos:
+                if file.lower().endswith('.xml'):
+                    xml_file = os.path.join(caminho_pasta, file)
+                    try:
+                        # Parse do arquivo XML
+                        tree = minidom.parse(xml_file)
+                        nf_list = tree.getElementsByTagName('nNF')
+
+                        # Verificar se há elementos `nNF`
+                        if nf_list and nf_list[0].firstChild:
+                            numero_nf = nf_list[0].firstChild.nodeValue.strip()
+
+                            # Criar novo nome para o arquivo
+                            novos_digitos = f"NF {numero_nf}.xml"
+                            caminho_novo = os.path.join(caminho_pasta, novos_digitos)
+
+                            # Renomear o arquivo
+                            os.rename(xml_file, caminho_novo)
+                            print(f"Renomeado: {file} -> {novos_digitos}")
+                        else:
+                            print(f"Arquivo {file} não contém o elemento 'nNF'.")
+                    except Exception as e:
+                        print(f"Erro ao processar {file}: {e}")
+
+            print("\nRenomeação concluída!\n")
+
+            lobby_principal()
+
+        except Exception as e:
+            print(f'Ocorreu um erro: {e}')
+
+    elif confirmar3 == 'N':
+        print('=' * 60)
+        lobby_voltar()
+    
+    else:
+        print('\nValor inválido\n')
+
+def renomear_PDF_4(caminho_pasta, prefixo):
+
+    print('=' * 60)
+
+    confirmar4 = str(input('Tem certeza que deseja renomear PDFs 4?(S/N): ')).strip().upper()
+
+    if confirmar4 == 'S':
+
+        try:
+            os.chdir(caminho_pasta)
+            arquivos = os.listdir(caminho_pasta)
+
+            for file in arquivos:
+                if file.endswith('DANFE.pdf') and not file.startswith(prefixo):
+
+                    old_name = os.path.join(caminho_pasta, file)
+
+                    new_name = str(prefixo + file)
+
+                    novos_digitos = ('NF ' + new_name[31:37])
+
+                    caminho_novo = os.path.join(caminho_pasta, novos_digitos + '.pdf')
+
+                    os.rename(old_name, caminho_novo)
+                    print(f'Renomeado: {old_name} -> {caminho_novo}')
+
+            print('\nRenomeação concluída!\n')
+
+            lobby_principal()
+
+        except Exception as e:
+            print(f'Ocorreu um erro: {e}')
+
+    elif confirmar4 == 'N':
+        print('=' * 60)
+        lobby_voltar()
+    
+    else:
+        print('\nValor inválido\n')
+
+def renomear_XML_5(caminho_pasta, prefixo):
+
+    print('=' * 60)
+
+    confirmar5 = str(input('Tem certeza que deseja renomear XMLs 5?(S/N): ')).strip().upper()
+
+    if confirmar5 == 'S':
+
+        try:
+            os.chdir(caminho_pasta)
+            arquivos = os.listdir(caminho_pasta)
+
+            for file in arquivos:
+                if file.endswith('-procNFe.xml') and not file.startswith(prefixo):
+                    # Caminho completo do arquivo
+                    xml_file = os.path.join(caminho_pasta, file)
+                        
+                    try:
+                        # Parse do arquivo XML
+                        tree = minidom.parse(xml_file)
+                        nf_list = tree.getElementsByTagName('nNF')
+
+                        # Verificar se há elementos 'nNF'
+                        if nf_list and nf_list[0].firstChild:
+                            numero_nf = nf_list[0].firstChild.nodeValue
+                            
+                            # Criar novo nome para o arquivo
+                            novos_digitos = f'NF {numero_nf}.xml'
+                            caminho_novo = os.path.join(caminho_pasta, novos_digitos)
+
+                            # Renomear o arquivo
+                            os.rename(xml_file, caminho_novo)
+                            print(f'Renomeado: {file} -> {novos_digitos}')
+                        else:
+                            print(f"Arquivo {file} não contém o elemento 'nNF'.")
+                    except Exception as e:
+                        print(f'Erro ao processar {file}: {e}')
+
+            print('\nRenomeação concluída!\n')
+
+            lobby_principal()
+
+        except Exception as e:
+            print(f'Ocorreu um erro: {e}')
+
+    elif confirmar5 == 'N':
+        print('=' * 60)
+        lobby_voltar()
+    
+    else:
+        print('\nValor inválido\n')
+        
+def renomear_PDF_6(caminho_pasta, prefixo):
+
+    print('=' * 60)
+
+    confirmar6 = str(input('Tem certeza que deseja renomear PDFs 6?(S/N): ')).strip().upper()
+
+    if confirmar6 == 'S':
+
+        try:
+            os.chdir(caminho_pasta)
+            arquivos = os.listdir(caminho_pasta)
+
+            for file in arquivos:
+                if file.lower().endswith('-nfe.pdf') and not file.startswith(prefixo):
+
+                    old_name = os.path.join(caminho_pasta, file)
+
+                    new_name = str(prefixo + file)
+
+                    novos_digitos = ('NF ' + new_name[31:37])
+
+                    caminho_novo = os.path.join(caminho_pasta, novos_digitos + '.pdf')
+
+                    os.rename(old_name, caminho_novo)
+                    print(f'Renomeado: {old_name} -> {caminho_novo}')
+
+            print('\nRenomeação concluída!\n')
+
+            lobby_principal()
+        except Exception as e:
+            print(f'Ocorreu um erro: {e}')
+
+    elif confirmar6 == 'N':
+        print('=' * 60)
+        lobby_voltar()
+    
+    else:
+        print('\nValor inválido\n')
+
+def renomear_XML_7(caminho_pasta, prefixo):
+
+    print('=' * 60)
+
+    confirmar7 = str(input('Tem certeza que deseja renomear XMLs 7?(S/N): ')).strip().upper()
+
+    if confirmar7 == 'S':
+
+        try:
+            os.chdir(caminho_pasta)
+            arquivos = os.listdir(caminho_pasta)
+
+            for file in arquivos:
+                if file.endswith('-nfe.xml') and not file.startswith(prefixo):
+                    # Caminho completo do arquivo
+                    xml_file = os.path.join(caminho_pasta, file)
+                        
+                    try:
+                        # Parse do arquivo XML
+                        tree = minidom.parse(xml_file)
+                        nf_list = tree.getElementsByTagName('nNF')
+
+                        # Verificar se há elementos 'nNF'
+                        if nf_list and nf_list[0].firstChild:
+                            numero_nf = nf_list[0].firstChild.nodeValue
+                            
+                            # Criar novo nome para o arquivo
+                            novos_digitos = f'NF {numero_nf}.xml'
+                            caminho_novo = os.path.join(caminho_pasta, novos_digitos)
+
+                            # Renomear o arquivo
+                            os.rename(xml_file, caminho_novo)
+                            print(f'Renomeado: {file} -> {novos_digitos}')
+                        else:
+                            print(f"Arquivo {file} não contém o elemento 'nNF'.")
+                    except Exception as e:
+                        print(f'Erro ao processar {file}: {e}')
+
+            print('\nRenomeação concluída!\n')
+
+            lobby_principal()
+
+        except Exception as e:
+            print(f'Ocorreu um erro: {e}')
+
+    elif confirmar7 == 'N':
+        print('=' * 60)
+        lobby_voltar()
+    
+    else:
+        print('\nValor inválido\n')
+
+def renomear_PDFs_8(caminho_pasta, prefixo):
+
+    print('=' * 60)
+
+    confirmar8 = str(input('Tem certeza que deseja renomear PDFs 8?(S/N): ')).strip().upper()
+
+    if confirmar8 == 'S':
+
+        try:
+            os.chdir(caminho_pasta)
+            arquivos = os.listdir(caminho_pasta)
+
+            for file in arquivos:
+                if file.lower().endswith('.pdf') and not file.startswith(prefixo):
+                    old_name = os.path.join(caminho_pasta, file)
+                    new_name = str(prefixo + file)
+                    # Para notas da HP, utilizar o new_name abaixo = 
+                    novos_digitos = ('NF ' + new_name[31:37])
+                    caminho_novo = os.path.join(caminho_pasta, novos_digitos + '.pdf')
+
+                    os.rename(old_name, caminho_novo)
+                    print(f'Renomeado: {old_name} -> {caminho_novo}')
+
+            print('\nRenomeação concluída!\n')
+
+            lobby_principal()
+
+        except Exception as e:
+            print(f'Ocorreu um erro: {e}')
+
+    elif confirmar8 == 'N':
+        print('=' * 60)
+        lobby_voltar()
+    
+    else:
+        print('\nValor inválido\n')
+
+def renomear_XMLs_9(caminho_pasta, prefixo):
+
+    print('=' * 60)
+
+    confirmar8 = str(input('Tem certeza que deseja renomear XMLs 9?(S/N): ')).strip().upper()
+
+    if confirmar8 == 'S':
+
+        try:
+            os.chdir(caminho_pasta)
+            arquivos = os.listdir(caminho_pasta)
+
+            for file in arquivos:
+                if file.lower().endswith('.xml') and not file.startswith(prefixo):
+                    old_name = os.path.join(caminho_pasta, file)
+                    new_name = str(prefixo + file)
+                    # Para notas da HP, utilizar o new_name abaixo = 
+                    novos_digitos = ('NF ' + new_name[31:37])
+                    caminho_novo = os.path.join(caminho_pasta, novos_digitos + '.xml')
+
+                    os.rename(old_name, caminho_novo)
+                    print(f'Renomeado: {old_name} -> {caminho_novo}')
+
+            print('\nRenomeação concluída!\n')
+
+            lobby_principal()
+
+        except Exception as e:
+            print(f'Ocorreu um erro: {e}')
+
+    elif confirmar8 == 'N':
+        print('=' * 60)
+        lobby_voltar()
+    
+    else:
+        print('\nValor inválido\n')
+
+def lobby_principal():
+
+    print('')
+    print('=' * 60)
+    print('\n              Renomeador de arquivos EMME 2\n')
+    print('=' * 60)
+    print('')
+
+    escolher = int(input('1 - PDF 1\n2 - XML 2\n3 - XML 3 NÃO CONFIRMADO\n4 - PDF 4\n5 - XML 5\n6 - PDF 6\n7 - XML 7\n8 - PDF 8\n9 - XML 9\n\nEscolha o número da operação que deseja fazer: '))
+
+    while escolher:
+
+        if escolher == 1:
+            renomear_PDF_1(caminho_pasta, prefixo)
+
+        elif escolher == 2:
+            renomear_XML_2(caminho_pasta, prefixo)
+
+        elif escolher == 3:
+            renomear_XML_3_nãoConfirmado(caminho_pasta)
+
+        elif escolher == 4:
+            renomear_PDF_4(caminho_pasta, prefixo)
+
+        elif escolher == 5:
+            renomear_XML_5(caminho_pasta, prefixo)
+
+        elif escolher == 6:
+            renomear_PDF_6(caminho_pasta, prefixo)
+
+        elif escolher == 7:
+            renomear_XML_7(caminho_pasta, prefixo)
+
+        elif escolher == 8:
+            renomear_PDFs_8(caminho_pasta, prefixo)
+        
+        elif escolher == 9:
+            renomear_XMLs_9(caminho_pasta, prefixo)
+
+        else:
+            print('\nPor favor, digite uma opção válida.\n')
+            escolher = int(input('1 - PDF 1\n2 - XML 1\n3 - XML 3 NÃO CONFIRMADO\n4 - PDF 4\n5 - XML 5\n6 - PDF 6\n7 - XML 7\n8 - PDF 8\n9 - XML 9\n\nEscolha o número da operação que deseja fazer: '))
+
+def lobby_voltar():
+
+    print('\n')
+    print('Lobby Principal')
+    print('=' * 60)
+    print('\nSem problemas! Tente novamente escolher uma opção.\n')
+
+    escolher = int(input('1 - PDF 1\n2 - XML 1\n3 - XML 3 NÃO CONFIRMADO\n4 - PDF 4\n5 - XML 5\n6 - PDF 6\n7 - XML 7\n8 - PDF 8\n9 - XML 9\n\nEscolha o número da operação que deseja fazer: '))
+
+    while escolher:
+
+        if escolher == 1:
+            renomear_PDF_1(caminho_pasta, prefixo)
+
+        elif escolher == 2:
+            renomear_XML_2(caminho_pasta, prefixo)
+
+        elif escolher == 3:
+            renomear_XML_3_nãoConfirmado(caminho_pasta)
+
+        elif escolher == 4:
+            renomear_PDF_4(caminho_pasta, prefixo)
+
+        elif escolher == 5:
+            renomear_XML_5(caminho_pasta, prefixo)
+
+        elif escolher == 6:
+            renomear_PDF_6(caminho_pasta, prefixo)
+
+        elif escolher == 7:
+            renomear_XML_7(caminho_pasta, prefixo)
+
+        elif escolher == 8:
+            renomear_PDFs_8(caminho_pasta, prefixo)
+        
+        elif escolher == 9:
+            renomear_XMLs_9(caminho_pasta, prefixo)
+
+        else:
+            print('\nPor favor, digite uma opção válida.\n')
+            escolher = int(input('1 - PDF 1\n2 - XML 1\n3 - XML 3 NÃO CONFIRMADO\n4 - PDF 4\n5 - XML 5\n6 - PDF 6\n7 - XML 7\n8 - PDF 8\n9 - XML 9\n\nEscolha o número da operação que deseja fazer: '))
+
+lobby_principal()
