@@ -2,7 +2,7 @@ import os
 from xml.dom import minidom
 import time
 
-caminho_pasta = r'C:\Users\Marcelo Abud\Downloads\XML_DELL'
+caminho_pasta = r'Digite o caminho para o arquivo que contém os itens a serem renomeados'
 
 prefixo = 'NF '
 
